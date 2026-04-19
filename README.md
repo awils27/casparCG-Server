@@ -1,3 +1,8 @@
+Whats Changed
+===============
+This repo has minor edits to allow building casparCG server with a diffrent version of CEF, this allows you to build it with H.264/AAC/AVC codec enabled.
+
+
 CasparCG Server
 ===============
 

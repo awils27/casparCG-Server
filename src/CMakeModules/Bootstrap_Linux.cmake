@@ -55,10 +55,23 @@ if (ENABLE_HTML)
             "${CEF_LIB_PATH}/libcef_dll_wrapper.a"
         )
     else()
+        set(CASPARCG_CEF_LINUX_URL
+            "${CASPARCG_DOWNLOAD_MIRROR}/cef/cef_binary_142.0.17+g60aac24+chromium-142.0.7444.176_linux64_minimal.tar.bz2"
+            CACHE STRING "URL or local path to the Linux CEF binary archive to build against"
+        )
+        set(CASPARCG_CEF_LINUX_HASH
+            "SHA256=1d89e19b2f446105f9a1fe6fdc96bced86249b5884241dcc4013b7c94dabf424"
+            CACHE STRING "Optional URL_HASH value for CASPARCG_CEF_LINUX_URL"
+        )
+        set(_casparcg_cef_hash_arg "")
+        if (CASPARCG_CEF_LINUX_HASH)
+            list(APPEND _casparcg_cef_hash_arg URL_HASH ${CASPARCG_CEF_LINUX_HASH})
+        endif()
+
         casparcg_add_external_project(cef)
         ExternalProject_Add(cef
-            URL ${CASPARCG_DOWNLOAD_MIRROR}/cef/cef_binary_142.0.17+g60aac24+chromium-142.0.7444.176_linux64_minimal.tar.bz2
-            URL_HASH SHA256=1d89e19b2f446105f9a1fe6fdc96bced86249b5884241dcc4013b7c94dabf424
+            URL ${CASPARCG_CEF_LINUX_URL}
+            ${_casparcg_cef_hash_arg}
             DOWNLOAD_DIR ${CASPARCG_DOWNLOAD_CACHE}
             CMAKE_ARGS -DUSE_SANDBOX=Off
             INSTALL_COMMAND ""

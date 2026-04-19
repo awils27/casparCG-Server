@@ -217,10 +217,23 @@ casparcg_add_runtime_dependency("${LIBERATION_FONTS_BIN_PATH}/LiberationMono-Reg
 
 # CEF
 if (ENABLE_HTML)
+	set(CASPARCG_CEF_WINDOWS_URL
+		"${CASPARCG_DOWNLOAD_MIRROR}/cef/cef_binary_142.0.17+g60aac24+chromium-142.0.7444.176_windows64_minimal.tar.bz2"
+		CACHE STRING "URL or local path to the Windows CEF binary archive to build against"
+	)
+	set(CASPARCG_CEF_WINDOWS_HASH
+		"SHA256=16c072a44484fe521037c74d03a339a77573b1fc0146cf44cc71e79fd0cc0198"
+		CACHE STRING "Optional URL_HASH value for CASPARCG_CEF_WINDOWS_URL"
+	)
+	set(_casparcg_cef_hash_arg "")
+	if (CASPARCG_CEF_WINDOWS_HASH)
+		list(APPEND _casparcg_cef_hash_arg URL_HASH ${CASPARCG_CEF_WINDOWS_HASH})
+	endif()
+
 	casparcg_add_external_project(cef)
 	ExternalProject_Add(cef
-		URL ${CASPARCG_DOWNLOAD_MIRROR}/cef/cef_binary_142.0.17+g60aac24+chromium-142.0.7444.176_windows64_minimal.tar.bz2
-		URL_HASH SHA256=16c072a44484fe521037c74d03a339a77573b1fc0146cf44cc71e79fd0cc0198
+		URL ${CASPARCG_CEF_WINDOWS_URL}
+		${_casparcg_cef_hash_arg}
 		DOWNLOAD_DIR ${CASPARCG_DOWNLOAD_CACHE}
 		CMAKE_ARGS -DUSE_SANDBOX=Off -DCEF_RUNTIME_LIBRARY_FLAG=/MD ${EXTERNAL_CMAKE_ARGS}
 		INSTALL_COMMAND ""

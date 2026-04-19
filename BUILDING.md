@@ -18,6 +18,32 @@ During the build, you can specify the CMake option `CASPARCG_DOWNLOAD_MIRROR` to
 If you want to be able to build CasparCG offline, you may need to manually seed this cache. You can do so by placing the correct tar.gz or zip into a folder and using `CASPARCG_DOWNLOAD_CACHE` to tell CMake where to find it.
 You can figure out which files you need by looking at each of the `ExternalProject_Add` function calls inside of [Bootstrap_Linux.cmake](./src/CMakeModules/Bootstrap_Linux.cmake) or [Bootstrap_Windows.cmake](./src/CMakeModules/Bootstrap_Windows.cmake). Some of the ones listed are optional, depending on other CMake flags.
 
+# CEF with proprietary codecs
+
+The bundled CEF archives are the standard CasparCG dependency builds. To use CEF with H.264/AAC enabled, build or obtain a matching `cef_binary_*.tar.bz2` with Chromium proprietary codecs enabled, then pass it to CMake with `CASPARCG_CEF_WINDOWS_URL` or `CASPARCG_CEF_LINUX_URL`.
+
+For CEF source builds, the important GN defines are:
+
+```bat
+set GN_DEFINES=is_official_build=true proprietary_codecs=true ffmpeg_branding=Chrome
+```
+
+When testing a local archive, set the matching hash option to an empty string. For example, on Windows:
+
+```bat
+cmake -S src -B build -DCASPARCG_CEF_WINDOWS_URL=C:\path\to\cef_binary_142_h264_windows64.tar.bz2 -DCASPARCG_CEF_WINDOWS_HASH=
+cmake --build build --config Release --parallel
+```
+
+On Linux, disable the system CEF package so the custom archive is used:
+
+```sh
+cmake -S src -B build -DUSE_SYSTEM_CEF=OFF -DCASPARCG_CEF_LINUX_URL=/path/to/cef_binary_142_h264_linux64.tar.bz2 -DCASPARCG_CEF_LINUX_HASH=
+cmake --build build --parallel
+```
+
+Make sure you are comfortable with the codec licensing implications before distributing binaries built this way.
+
 # Windows
 
 ## Building distributable
@@ -95,6 +121,14 @@ If all goes to plan, a folder called 'staging' has been created with everything 
 -DUSE_STATIC_BOOST=ON - (Linux only, default OFF) statically link against Boost.
 
 -DUSE_SYSTEM_CEF=OFF - (Linux only, default ON) use the version of CEF from your OS. This expects to be using builds from https://launchpad.net/~casparcg/+archive/ubuntu/ppa
+
+-DCASPARCG_CEF_WINDOWS_URL=<path-or-url> - (Windows only) use a different CEF binary archive. This can be a local `cef_binary_*.tar.bz2` built with proprietary codecs.
+
+-DCASPARCG_CEF_WINDOWS_HASH=<hash> - (Windows only) hash for `CASPARCG_CEF_WINDOWS_URL`, for example `SHA256=...`. Set to an empty string when using an unsigned local test archive.
+
+-DCASPARCG_CEF_LINUX_URL=<path-or-url> - (Linux only, requires `-DUSE_SYSTEM_CEF=OFF`) use a different CEF binary archive. This can be a local `cef_binary_*.tar.bz2` built with proprietary codecs.
+
+-DCASPARCG_CEF_LINUX_HASH=<hash> - (Linux only) hash for `CASPARCG_CEF_LINUX_URL`, for example `SHA256=...`. Set to an empty string when using an unsigned local test archive.
 
 -DENABLE_AVX2=ON (Linux only, default OFF) Enable the AVX and AVX2 instruction sets (requires a CPU that supports it)
 
